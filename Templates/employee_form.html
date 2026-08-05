@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ 'تعديل موظف' if employee else 'إضافة موظف' }}{% endblock %}
+{% block content %}
+<h4 class="mb-3">{{ 'تعديل موظف' if employee else 'إضافة موظف جديد' }}</h4>
+<div class="card p-4" style="max-width:600px">
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">الاسم (لاتيني) *</label>
+            <input type="text" name="name" class="form-control" required value="{{ employee.Name if employee else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">الاسم بالعربية</label>
+            <input type="text" name="name_ar" class="form-control" value="{{ employee.Name_AR if employee else '' }}">
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">الجنس</label>
+                <select name="sex" class="form-select">
+                    <option value="">--</option>
+                    <option value="ذكر" {% if employee and employee.Sex=='ذكر' %}selected{% endif %}>ذكر</option>
+                    <option value="أنثى" {% if employee and employee.Sex=='أنثى' %}selected{% endif %}>أنثى</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">رقم RIP</label>
+                <input type="text" name="rip" class="form-control" value="{{ employee.RIP if employee else '' }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">القسم</label>
+                <input type="text" name="department" class="form-control" value="{{ employee.Department if employee else '' }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">الهاتف</label>
+                <input type="text" name="phone" class="form-control" value="{{ employee.Phone if employee else '' }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">حفظ</button>
+        <a href="{{ url_for('employees') }}" class="btn btn-secondary">إلغاء</a>
+    </form>
+</div>
+{% endblock %}

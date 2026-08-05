@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}الميزانية والإعدادات{% endblock %}
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-gear me-2"></i>الميزانية والحسابات البنكية</h4>
+
+<form method="post">
+<div class="card p-4 mb-3">
+    <h6 class="mb-3"><i class="bi bi-building me-1"></i> إعدادات المكتب</h6>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">اسم المكتب</label>
+            <input type="text" name="office_name" class="form-control" value="{{ office_name }}">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">سنة الميزانية</label>
+            <input type="text" name="budget_year" class="form-control" value="{{ budget_year }}">
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card p-4 h-100" style="border-right:4px solid #198754">
+            <h6 class="mb-3"><i class="bi bi-cash-coin me-1"></i> حساب القروض</h6>
+            <p class="text-muted small">الأقساط المسددة من الموظفين تعود مباشرة إلى هذا الحساب البنكي.</p>
+            <div class="mb-3">
+                <label class="form-label">الميزانية المخصصة للقروض</label>
+                <input type="number" step="1" name="budget_credits_total" class="form-control" value="{{ budget_credits_total }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">رقم الحساب البنكي (RIB / IBAN)</label>
+                <input type="text" name="bank_account_credits" class="form-control" value="{{ bank_account_credits }}" placeholder="مثال: 007 00001 0000123456 78">
+            </div>
+            <hr>
+            <div class="progress mb-2" style="height:20px">
+                <div class="progress-bar {% if budget.credits.percent_used > 90 %}bg-danger{% elif budget.credits.percent_used > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                     style="width:{{ budget.credits.percent_used }}%">{{ budget.credits.percent_used }}%</div>
+            </div>
+            <table class="table table-sm mb-0">
+                <tr><td>الميزانية المخصصة</td><td class="fw-bold">{{ "{:,.0f}".format(budget.credits.total) }}</td></tr>
+                <tr><td>مبالغ قروض غير مسددة بعد</td><td class="text-info">{{ "{:,.0f}".format(budget.credits.outstanding) }}</td></tr>
+                <tr><td>المتاح حالياً في الحساب</td><td class="text-success fw-bold">{{ "{:,.0f}".format(budget.credits.remaining) }}</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-4 h-100" style="border-right:4px solid #fd7e14">
+            <h6 class="mb-3"><i class="bi bi-gift me-1"></i> حساب المنح والنشاطات الأخرى</h6>
+            <p class="text-muted small">يغطي هذا الحساب المنح (زواج، ولادة، حج...) والنشاطات (أعياد، خرجات سياحية...) وهو مصروف غير قابل للاسترجاع.</p>
+            <div class="mb-3">
+                <label class="form-label">الميزانية المخصصة للمنح والنشاطات</label>
+                <input type="number" step="1" name="budget_aides_total" class="form-control" value="{{ budget_aides_total }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">رقم الحساب البنكي (RIB / IBAN)</label>
+                <input type="text" name="bank_account_aides" class="form-control" value="{{ bank_account_aides }}" placeholder="مثال: 007 00001 0000654321 78">
+            </div>
+            <hr>
+            <div class="progress mb-2" style="height:20px">
+                <div class="progress-bar {% if budget.aides.percent_used > 90 %}bg-danger{% elif budget.aides.percent_used > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                     style="width:{{ budget.aides.percent_used }}%">{{ budget.aides.percent_used }}%</div>
+            </div>
+            <table class="table table-sm mb-0">
+                <tr><td>الميزانية المخصصة</td><td class="fw-bold">{{ "{:,.0f}".format(budget.aides.total) }}</td></tr>
+                <tr><td>مصروف المنح</td><td class="text-warning">{{ "{:,.0f}".format(budget.aides.spent_aides) }}</td></tr>
+                <tr><td>مصروف النشاطات</td><td class="text-warning">{{ "{:,.0f}".format(budget.aides.spent_activities) }}</td></tr>
+                <tr><td>إجمالي المصروف</td><td class="text-danger fw-bold">{{ "{:,.0f}".format(budget.aides.spent_total) }}</td></tr>
+                <tr><td>المتبقي</td><td class="text-success fw-bold">{{ "{:,.0f}".format(budget.aides.remaining) }}</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<button type="submit" class="btn btn-primary"><i class="bi bi-check2"></i> حفظ الإعدادات</button>
+</form>
+{% endblock %}

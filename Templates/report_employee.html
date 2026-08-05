@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}تقرير موظف{% endblock %}
+{% block content %}
+<div class="print-header">
+    <h3>{{ office_name }}</h3>
+    <p>تقرير فردي للموظف — {{ now }}</p>
+</div>
+<div class="d-flex justify-content-between mb-3 no-print">
+    <h4>تقرير: {{ emp.Name_AR or emp.Name }}</h4>
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة</button>
+</div>
+<div class="card p-3 mb-3">
+    <table class="table table-sm mb-0">
+        <tr><td class="text-muted" width="30%">الاسم</td><td>{{ emp.Name }}</td></tr>
+        <tr><td class="text-muted">بالعربية</td><td>{{ emp.Name_AR or '-' }}</td></tr>
+        <tr><td class="text-muted">RIP</td><td>{{ emp.RIP or '-' }}</td></tr>
+        <tr><td class="text-muted">القسم</td><td>{{ emp.Department or '-' }}</td></tr>
+        <tr><td class="text-muted">الهاتف</td><td>{{ emp.Phone or '-' }}</td></tr>
+    </table>
+</div>
+<div class="card p-3 mb-3">
+    <h6>القروض (مجموع: {{ "{:,.0f}".format(total_credits) }})</h6>
+    <table class="table table-sm table-bordered">
+        <thead><tr><th>#</th><th>النوع</th><th>المبلغ</th><th>الأشهر</th><th>الحالة</th></tr></thead>
+        <tbody>
+        {% for c in credits %}
+        <tr><td>{{ c.ID }}</td><td>{{ c.Type_Credit }}</td><td>{{ "{:,.0f}".format(c.Montant) }}</td><td>{{ c.Months }}</td><td>{{ c.Status }}</td></tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted text-center">لا توجد</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="card p-3 mb-3">
+    <h6>المنح المقبولة (مجموع: {{ "{:,.0f}".format(total_aides) }})</h6>
+    <table class="table table-sm table-bordered">
+        <thead><tr><th>#</th><th>النوع</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+        <tbody>
+        {% for a in aides %}
+        <tr><td>{{ a.ID }}</td><td>{{ a.Type_AIDE }}</td><td>{{ "{:,.0f}".format(a.Montant or 0) }}</td><td>{{ a.Status }}</td><td>{{ a.Created_At[:10] if a.Created_At else '-' }}</td></tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted text-center">لا توجد</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="card p-3">
+    <h6>النشاطات (مجموع: {{ "{:,.0f}".format(total_activities) }})</h6>
+    <table class="table table-sm table-bordered">
+        <thead><tr><th>#</th><th>النشاط</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+        <tbody>
+        {% for a in activities %}
+        <tr><td>{{ a.ID }}</td><td>{{ a.Type_Activity }}</td><td>{{ "{:,.0f}".format(a.Montant or 0) }}</td><td>{{ a.Status }}</td><td>{{ a.Date_Activity or (a.Created_At[:10] if a.Created_At else '-') }}</td></tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted text-center">لا توجد</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

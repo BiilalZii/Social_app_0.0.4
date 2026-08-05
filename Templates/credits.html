@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}القروض{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <h4 class="mb-0"><i class="bi bi-cash-coin me-2"></i>القروض
+        <small class="text-muted fs-6">| المتبقي الإجمالي: {{ "{:,.0f}".format(total_remaining) }}</small>
+    </h4>
+    <div class="d-flex gap-2 flex-wrap">
+        <form method="get" class="d-flex gap-1">
+            <input type="text" name="q" class="form-control form-control-sm" value="{{ q }}" placeholder="بحث ID أو اسم...">
+            <select name="status" class="form-select form-select-sm" style="width:auto">
+                <option value="">الكل</option>
+                <option value="نشط" {% if status=='نشط' %}selected{% endif %}>نشط</option>
+                <option value="مسدد" {% if status=='مسدد' %}selected{% endif %}>مسدد</option>
+                <option value="ملغي" {% if status=='ملغي' %}selected{% endif %}>ملغي</option>
+            </select>
+            <button class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i></button>
+        </form>
+        <a href="{{ url_for('add_credit') }}" class="btn btn-success btn-sm"><i class="bi bi-plus"></i> قرض</a>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>#</th><th>الموظف</th><th>النوع</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th>
+                    <th>البداية</th><th>النهاية</th><th>الحالة</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in credits %}
+            <tr>
+                <td>{{ c.ID }}</td>
+                <td>
+                    <a href="{{ url_for('view_employee', id=c.Employee_ID) }}">#{{ c.Employee_ID }}</a>
+                    {{ c.Name_AR or c.Name }}
+                </td>
+                <td>{{ c.Type_Credit }}</td>
+                <td>{{ "{:,.0f}".format(c.Montant) }}</td>
+                <td class="text-success">{{ "{:,.0f}".format(c.paid) }}</td>
+                <td class="text-danger fw-bold">{{ "{:,.0f}".format(c.remaining) }}</td>
+                <td>{{ c.Start_Date[:10] if c.Start_Date else '-' }}</td>
+                <td>{{ c.End_Date[:10] if c.End_Date else '-' }}</td>
+                <td>
+                    <span class="badge bg-{{ 'success' if c.Status=='نشط' else 'secondary' }}">{{ c.Status }}</span>
+                    {% if c.Is_Paused %}<span class="badge bg-warning">موقوف</span>{% endif %}
+                </td>
+                <td class="text-nowrap">
+                    <a href="{{ url_for('credit_detail', id=c.ID) }}" class="btn btn-sm btn-outline-info" title="تفاصيل"><i class="bi bi-eye"></i></a>
+                    <a href="{{ url_for('credit_certificate', id=c.ID) }}" class="btn btn-sm btn-outline-secondary" title="شهادة"><i class="bi bi-award"></i></a>
+                    <a href="{{ url_for('edit_credit', id=c.ID) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="10" class="text-center text-muted py-4">لا توجد قروض</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

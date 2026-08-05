@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}بحث{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-search me-2"></i>البحث</h4>
+<form method="get" class="mb-4">
+    <div class="input-group" style="max-width:500px">
+        <input type="text" name="q" class="form-control form-control-lg" value="{{ q }}" placeholder="اسم، رقم RIP، هاتف، نوع منحة..." autofocus>
+        <button class="btn btn-primary btn-lg"><i class="bi bi-search"></i> بحث</button>
+    </div>
+</form>
+
+{% if q %}
+<div class="mb-2 text-muted">نتائج البحث عن: <strong>{{ q }}</strong></div>
+
+<div class="card mb-3">
+    <div class="card-header">الموظفون ({{ results.employees|length }})</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>#</th><th>الاسم</th><th>الاسم بالعربية</th><th>RIP</th><th>القسم</th><th></th></tr></thead>
+            <tbody>
+            {% for e in results.employees %}
+            <tr>
+                <td>{{ e.ID }}</td>
+                <td>{{ e.Name }}</td>
+                <td>{{ e.Name_AR or '-' }}</td>
+                <td>{{ e.RIP or '-' }}</td>
+                <td>{{ e.Department or '-' }}</td>
+                <td><a href="{{ url_for('view_employee', id=e.ID) }}" class="btn btn-sm btn-outline-primary">عرض</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-center text-muted">لا نتائج</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">القروض ({{ results.credits|length }})</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>#</th><th>الموظف</th><th>النوع</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+            <tbody>
+            {% for c in results.credits %}
+            <tr>
+                <td>{{ c.ID }}</td>
+                <td>{{ c.Name_AR or c.Name }}</td>
+                <td>{{ c.Type_Credit }}</td>
+                <td>{{ "{:,.0f}".format(c.Montant) }}</td>
+                <td><span class="badge bg-{{ 'success' if c.Status=='نشط' else 'secondary' }}">{{ c.Status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted">لا نتائج</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">المنح ({{ results.aides|length }})</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>#</th><th>الموظف</th><th>النوع</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+            <tbody>
+            {% for a in results.aides %}
+            <tr>
+                <td>{{ a.ID }}</td>
+                <td>{{ a.Name_AR or a.Name }}</td>
+                <td>{{ a.Type_AIDE }}</td>
+                <td>{{ "{:,.0f}".format(a.Montant or 0) }}</td>
+                <td><span class="badge bg-info">{{ a.Status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted">لا نتائج</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">النشاطات ({{ results.activities|length }})</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>#</th><th>الموظف</th><th>النشاط</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+            <tbody>
+            {% for a in results.activities %}
+            <tr>
+                <td>{{ a.ID }}</td>
+                <td>{{ a.Name_AR or a.Name }}</td>
+                <td>{{ a.Type_Activity }}</td>
+                <td>{{ "{:,.0f}".format(a.Montant or 0) }}</td>
+                <td><span class="badge bg-info">{{ a.Status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center text-muted">لا نتائج</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

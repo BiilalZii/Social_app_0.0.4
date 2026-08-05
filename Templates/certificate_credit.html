@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}شهادة منح قرض{% endblock %}
+{% block content %}
+<div class="no-print mb-3">
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة الشهادة</button>
+    <a href="{{ url_for('credit_detail', id=c.ID) }}" class="btn btn-secondary">رجوع</a>
+</div>
+<div class="certificate">
+    <div class="text-center mb-4">
+        <h5 class="mb-1">{{ office_name }}</h5>
+        <h2 class="mt-3">شهادة منح قرض</h2>
+        <p class="text-muted">رقم القرض: {{ c.ID }}</p>
+    </div>
+    <p class="lead" style="line-height:2">
+        يشهد مكتب الخدمات الاجتماعية بأن الموظف/ة:
+    </p>
+    <table class="table table-bordered mb-4">
+        <tr><td width="30%">الاسم الكامل</td><td><strong>{{ c.Name_AR or c.Name }}</strong></td></tr>
+        <tr><td>رقم التعريف (ID)</td><td>{{ c.Employee_ID }}</td></tr>
+        <tr><td>رقم RIP</td><td>{{ c.RIP or '-' }}</td></tr>
+        <tr><td>القسم</td><td>{{ c.Department or '-' }}</td></tr>
+    </table>
+    <p>قد استفاد من قرض من نوع <strong>{{ c.Type_Credit }}</strong> بالمبلغ التالي:</p>
+    <div class="text-center my-3">
+        <h3 class="text-primary">{{ "{:,.0f}".format(c.Montant) }} د.ج</h3>
+    </div>
+    <table class="table table-sm table-bordered mb-4">
+        <tr><td>عدد الأقساط</td><td>{{ c.Months }} شهر</td></tr>
+        <tr><td>القسط الشهري</td><td>{{ "{:,.0f}".format(c.Monthly_Amount or 0) }} د.ج</td></tr>
+        <tr><td>بداية التسديد</td><td>{{ c.Start_Date or '-' }}</td></tr>
+        <tr><td>نهاية التسديد</td><td>{{ c.End_Date or '-' }}</td></tr>
+        <tr><td>المدفوع حتى الآن</td><td>{{ "{:,.0f}".format(paid) }} د.ج</td></tr>
+        <tr><td>المتبقي</td><td>{{ "{:,.0f}".format(remaining) }} د.ج</td></tr>
+        <tr><td>الحالة</td><td>{{ c.Status }}{% if c.Is_Paused %} (موقوف مؤقتاً){% endif %}</td></tr>
+    </table>
+    <div class="row mt-5">
+        <div class="col-6 text-center">
+            <p>توقيع المسؤول</p>
+            <br><br>
+            <p>____________</p>
+        </div>
+        <div class="col-6 text-center">
+            <p>ختم المكتب</p>
+            <br><br>
+            <p>____________</p>
+        </div>
+    </div>
+    <p class="text-muted text-center mt-4 small">تاريخ الإصدار: {{ now }}</p>
+</div>
+{% endblock %}

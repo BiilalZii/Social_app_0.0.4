@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}تقرير القروض{% endblock %}
+{% block content %}
+<div class="print-header">
+    <h3>{{ office_name }}</h3>
+    <p>تقرير القروض — {{ now }}</p>
+</div>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 no-print">
+    <h4>تقرير القروض</h4>
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة</button>
+</div>
+<form method="get" class="card p-3 mb-3 no-print">
+    <div class="row g-2 align-items-end">
+        <div class="col-auto">
+            <select name="status" class="form-select form-select-sm">
+                <option value="">كل الحالات</option>
+                <option value="نشط" {% if status=='نشط' %}selected{% endif %}>نشط</option>
+                <option value="مسدد" {% if status=='مسدد' %}selected{% endif %}>مسدد</option>
+                <option value="ملغي" {% if status=='ملغي' %}selected{% endif %}>ملغي</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <select name="type" class="form-select form-select-sm">
+                <option value="">كل الأنواع</option>
+                <option value="سلفة نقدية" {% if type_credit=='سلفة نقدية' %}selected{% endif %}>سلفة نقدية</option>
+                <option value="قرض مستلزمات" {% if type_credit=='قرض مستلزمات' %}selected{% endif %}>قرض مستلزمات</option>
+            </select>
+        </div>
+        <div class="col-auto"><button class="btn btn-sm btn-primary">تطبيق</button></div>
+    </div>
+</form>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0">
+            <thead>
+                <tr><th>#</th><th>الموظف</th><th>RIP</th><th>النوع</th><th>المبلغ</th><th>الأشهر</th><th>الشيك</th><th>الحالة</th></tr>
+            </thead>
+            <tbody>
+            {% for c in rows %}
+            <tr>
+                <td>{{ c.ID }}</td>
+                <td>{{ c.Name_AR or c.Name }}</td>
+                <td>{{ c.RIP or '-' }}</td>
+                <td>{{ c.Type_Credit }}</td>
+                <td>{{ "{:,.0f}".format(c.Montant) }}</td>
+                <td>{{ c.Months }}</td>
+                <td>{{ c.N_check or '-' }}</td>
+                <td>{{ c.Status }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center text-muted">لا توجد نتائج</td></tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-light fw-bold">
+                    <td colspan="4">المجموع ({{ rows|length }} سجل)</td>
+                    <td>{{ "{:,.0f}".format(total) }}</td>
+                    <td colspan="3"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}

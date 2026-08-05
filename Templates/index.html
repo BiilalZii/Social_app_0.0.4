@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>لوحة التحكم</h4>
+    <form action="{{ url_for('search') }}" method="get" class="d-flex gap-2 no-print" style="max-width:400px">
+        <input type="text" name="q" class="form-control" placeholder="بحث سريع (ID أو اسم)..." required>
+        <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                <h6 class="mb-0"><i class="bi bi-cash-coin me-1 text-success"></i> حساب القروض</h6>
+                <a href="{{ url_for('settings') }}" class="btn btn-sm btn-outline-secondary no-print">تعديل</a>
+            </div>
+            <div class="progress mb-2" style="height:20px">
+                <div class="progress-bar {% if budget.credits.percent_used > 90 %}bg-danger{% elif budget.credits.percent_used > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                     style="width:{{ budget.credits.percent_used }}%">{{ budget.credits.percent_used }}%</div>
+            </div>
+            <div class="row text-center g-2">
+                <div class="col-4"><div class="text-muted small">الميزانية</div><strong>{{ "{:,.0f}".format(budget.credits.total) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">غير مسدد</div><strong class="text-info">{{ "{:,.0f}".format(budget.credits.outstanding) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">متاح</div><strong class="text-success">{{ "{:,.0f}".format(budget.credits.remaining) }}</strong></div>
+            </div>
+            {% if budget.credits.bank_account %}<div class="text-muted small mt-2"><i class="bi bi-bank"></i> {{ budget.credits.bank_account }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                <h6 class="mb-0"><i class="bi bi-gift me-1 text-warning"></i> حساب المنح والنشاطات</h6>
+                <a href="{{ url_for('settings') }}" class="btn btn-sm btn-outline-secondary no-print">تعديل</a>
+            </div>
+            <div class="progress mb-2" style="height:20px">
+                <div class="progress-bar {% if budget.aides.percent_used > 90 %}bg-danger{% elif budget.aides.percent_used > 70 %}bg-warning{% else %}bg-success{% endif %}"
+                     style="width:{{ budget.aides.percent_used }}%">{{ budget.aides.percent_used }}%</div>
+            </div>
+            <div class="row text-center g-2">
+                <div class="col-4"><div class="text-muted small">الميزانية</div><strong>{{ "{:,.0f}".format(budget.aides.total) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">المصروف</div><strong class="text-danger">{{ "{:,.0f}".format(budget.aides.spent_total) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">المتبقي</div><strong class="text-success">{{ "{:,.0f}".format(budget.aides.remaining) }}</strong></div>
+            </div>
+            {% if budget.aides.bank_account %}<div class="text-muted small mt-2"><i class="bi bi-bank"></i> {{ budget.aides.bank_account }}</div>{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3" style="border-color:#0d6efd">
+            <div class="text-muted small">الموظفون</div>
+            <h3 class="mb-0">{{ stats.employees }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3" style="border-color:#198754">
+            <div class="text-muted small">قروض نشطة</div>
+            <h3 class="mb-0">{{ stats.credits_active }}</h3>
+            <small class="text-muted">{{ "{:,.0f}".format(stats.total_credit) }} د.ج</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3" style="border-color:#fd7e14">
+            <div class="text-muted small">منح مقبولة</div>
+            <h3 class="mb-0">{{ stats.aides_accepted }}</h3>
+            <small class="text-muted">{{ "{:,.0f}".format(stats.total_aide) }} د.ج</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3" style="border-color:#20c997">
+            <div class="text-muted small">استفادات من النشاطات</div>
+            <h3 class="mb-0">{{ stats.activities_count }}</h3>
+            <small class="text-muted">{{ "{:,.0f}".format(stats.total_activities) }} د.ج</small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="card stat-card p-3" style="border-color:#6f42c1">
+            <div class="text-muted small">إجمالي المسدد (أقساط)</div>
+            <h3 class="mb-0">{{ "{:,.0f}".format(stats.total_paid) }}</h3>
+            {% if stats.credits_paused %}<small class="text-warning">{{ stats.credits_paused }} قرض موقوف</small>{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="mb-3">المنح حسب النوع</h6>
+            {% if aide_by_type %}
+            <table class="table table-sm mb-0">
+                <thead><tr><th>النوع</th><th>العدد</th><th>المجموع</th></tr></thead>
+                <tbody>
+                {% for r in aide_by_type %}
+                <tr><td>{{ r.Type_AIDE }}</td><td>{{ r.cnt }}</td><td>{{ "{:,.0f}".format(r.total) }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted mb-0">لا بيانات</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6 class="mb-3">إجراءات سريعة</h6>
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('add_employee') }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-person-plus"></i> موظف جديد</a>
+                <a href="{{ url_for('add_credit') }}" class="btn btn-outline-success btn-sm"><i class="bi bi-plus-circle"></i> قرض جديد</a>
+                <a href="{{ url_for('add_aide') }}" class="btn btn-outline-warning btn-sm"><i class="bi bi-gift"></i> منحة جديدة</a>
+                <a href="{{ url_for('add_activity') }}" class="btn btn-outline-info btn-sm"><i class="bi bi-stars"></i> تسجيل استفادة من نشاط</a>
+                <a href="{{ url_for('report_summary') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer"></i> تقرير ملخص</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

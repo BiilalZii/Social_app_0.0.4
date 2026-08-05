@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ 'تعديل منحة' if aide else 'منحة جديدة' }}{% endblock %}
+{% block content %}
+<h4 class="mb-3">{{ 'تعديل منحة' if aide else 'تسجيل منحة جديدة' }}</h4>
+<div class="card p-4" style="max-width:700px">
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">الموظف * <small class="text-muted">(ابحث بالرقم أو الاسم)</small></label>
+            <select name="employee_id" class="form-select select2-employee" required>
+                <option value="">-- اختر الموظف --</option>
+                {% for e in employees %}
+                <option value="{{ e.ID }}" {% if aide and aide.Employee_ID==e.ID %}selected{% endif %}>
+                    #{{ e.ID }} — {{ e.Name_AR or e.Name }}{% if e.RIP %} ({{ e.RIP }}){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">نوع المنحة *</label>
+            <select name="type_aide" class="form-select" required id="typeAide">
+                <option value="">--</option>
+                {% for t in aide_types %}
+                <option value="{{ t.Type_AIDE }}" data-value="{{ t.Value }}"
+                    {% if aide and aide.Type_AIDE==t.Type_AIDE %}selected{% endif %}>
+                    {{ t.Type_AIDE }} ({{ "{:,.0f}".format(t.Value) }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">المبلغ</label>
+            <input type="number" step="0.01" name="montant" id="montant" class="form-control" value="{{ aide.Montant if aide else '' }}" placeholder="فارغ = القيمة الافتراضية">
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">نوع الوثيقة</label>
+                <input type="text" name="type_doc" class="form-control" value="{{ aide.Type_Doc if aide else '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">رقم الوثيقة</label>
+                <input type="text" name="n_doc" class="form-control" value="{{ aide.N_Doc if aide else '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">تاريخ الوثيقة</label>
+                <input type="date" name="date_doc" class="form-control" value="{{ aide.Date_Doc if aide else '' }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">ملاحظات</label>
+            <textarea name="notes" class="form-control" rows="2">{{ aide.Notes if aide else '' }}</textarea>
+        </div>
+        {% if aide %}
+        <div class="mb-3">
+            <label class="form-label">الحالة</label>
+            <select name="status" class="form-select">
+                <option value="مقبول" {% if aide.Status=='مقبول' %}selected{% endif %}>مقبول</option>
+                <option value="مرفوض" {% if aide.Status=='مرفوض' %}selected{% endif %}>مرفوض</option>
+                <option value="قيد المراجعة" {% if aide.Status=='قيد المراجعة' %}selected{% endif %}>قيد المراجعة</option>
+            </select>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-warning">حفظ</button>
+        <a href="{{ url_for('aides') }}" class="btn btn-secondary">إلغاء</a>
+    </form>
+</div>
+<script>
+document.getElementById('typeAide')?.addEventListener('change', function() {
+    const opt = this.options[this.selectedIndex];
+    const val = opt.getAttribute('data-value');
+    if (val && !document.getElementById('montant').value)
+        document.getElementById('montant').value = val;
+});
+</script>
+{% endblock %}

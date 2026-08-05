@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}تفاصيل القرض #{{ c.ID }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <h4 class="mb-0">قرض #{{ c.ID }} — {{ c.Name_AR or c.Name }}</h4>
+    <div class="no-print d-flex gap-1 flex-wrap">
+        <a href="{{ url_for('credit_certificate', id=c.ID) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-award"></i> شهادة</a>
+        <a href="{{ url_for('edit_credit', id=c.ID) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+        {% if c.Is_Paused %}
+        <a href="{{ url_for('credit_resume', id=c.ID) }}" class="btn btn-sm btn-success" onclick="return confirm('استئناف التسديد؟')"><i class="bi bi-play"></i> استئناف</a>
+        {% else %}
+        <a href="{{ url_for('credit_pause', id=c.ID) }}" class="btn btn-sm btn-warning"><i class="bi bi-pause"></i> إيقاف مؤقت</a>
+        {% endif %}
+        {% if c.Status == 'نشط' and not c.Is_Paused %}
+        <a href="{{ url_for('credit_pay_auto', id=c.ID) }}" class="btn btn-sm btn-info" onclick="return confirm('تسديد القسط التالي تلقائياً؟')"><i class="bi bi-lightning"></i> تسديد تلقائي</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if c.Is_Paused %}
+<div class="alert alert-warning">
+    <i class="bi bi-pause-circle"></i> <strong>التسديد موقوف مؤقتاً</strong>
+    منذ {{ c.Pause_Date }} — السبب: {{ c.Pause_Reason }}
+</div>
+{% endif %}
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <div class="text-muted small">المبلغ الأصلي</div>
+            <h4>{{ "{:,.0f}".format(c.Montant) }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <div class="text-muted small">المدفوع</div>
+            <h4 class="text-success">{{ "{:,.0f}".format(paid) }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <div class="text-muted small">المتبقي</div>
+            <h4 class="text-danger">{{ "{:,.0f}".format(remaining) }}</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6>بيانات القرض</h6>
+            <table class="table table-sm mb-0">
+                <tr><td class="text-muted">الموظف</td><td>#{{ c.Employee_ID }} — {{ c.Name_AR or c.Name }}</td></tr>
+                <tr><td class="text-muted">النوع</td><td>{{ c.Type_Credit }}</td></tr>
+                <tr><td class="text-muted">القسط الشهري</td><td>{{ "{:,.0f}".format(c.Monthly_Amount or 0) }}</td></tr>
+                <tr><td class="text-muted">عدد الأشهر</td><td>{{ c.Months }}</td></tr>
+                <tr><td class="text-muted">بداية التسديد</td><td>{{ c.Start_Date or '-' }}</td></tr>
+                <tr><td class="text-muted">نهاية التسديد</td><td>{{ c.End_Date or '-' }}</td></tr>
+                <tr><td class="text-muted">الحالة</td><td>
+                    <span class="badge bg-{{ 'success' if c.Status=='نشط' else 'secondary' }}">{{ c.Status }}</span>
+                    {% if c.Is_Paused %}<span class="badge bg-warning">موقوف</span>{% endif %}
+                </td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6 no-print">
+        <div class="card p-3">
+            <h6>تسجيل دفعة</h6>
+            <form method="post" action="{{ url_for('credit_pay', id=c.ID) }}">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="form-label small">المبلغ</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" required value="{{ c.Monthly_Amount or '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small">التاريخ</label>
+                        <input type="date" name="payment_date" class="form-control" value="{{ now if false else '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small">رقم القسط (اختياري)</label>
+                        <input type="number" name="month_number" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small">ملاحظة</label>
+                        <input type="text" name="notes" class="form-control">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success btn-sm w-100">تسجيل الدفعة</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <span>جدول الأقساط والمدفوعات</span>
+        <span class="text-muted small">{{ payments|length }} سجل</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead>
+                <tr><th>#</th><th>رقم القسط</th><th>المبلغ</th><th>التاريخ</th><th>تلقائي؟</th><th>ملاحظة</th><th class="no-print"></th></tr>
+            </thead>
+            <tbody>
+            {% for p in payments %}
+            <tr class="{% if p.Amount == 0 %}table-warning{% else %}table-success{% endif %}">
+                <td>{{ p.ID }}</td>
+                <td>{{ p.Month_Number or '-' }}</td>
+                <td>
+                    {% if p.Amount == 0 %}
+                    <span class="text-muted">مستحق (غير مدفوع)</span>
+                    {% else %}
+                    {{ "{:,.0f}".format(p.Amount) }}
+                    {% endif %}
+                </td>
+                <td>{{ p.Payment_Date }}</td>
+                <td>{% if p.Is_Auto %}<i class="bi bi-check text-info"></i>{% else %}-{% endif %}</td>
+                <td>{{ p.Notes or '-' }}</td>
+                <td class="no-print">
+                    <a href="{{ url_for('delete_payment', id=p.ID) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('حذف؟')"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-muted">لا توجد أقساط بعد</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

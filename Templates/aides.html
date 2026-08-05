@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}المنح{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <h4 class="mb-0"><i class="bi bi-gift me-2"></i>المنح
+        <small class="text-muted fs-6">| مجموع المقبولة: {{ "{:,.0f}".format(total) }}</small>
+    </h4>
+    <div class="d-flex gap-2 flex-wrap">
+        <form method="get" class="d-flex gap-1 flex-wrap">
+            <input type="text" name="q" class="form-control form-control-sm" value="{{ q }}" placeholder="بحث..." style="width:130px">
+            <select name="status" class="form-select form-select-sm" style="width:auto">
+                <option value="">الحالة</option>
+                <option value="مقبول" {% if status=='مقبول' %}selected{% endif %}>مقبول</option>
+                <option value="مرفوض" {% if status=='مرفوض' %}selected{% endif %}>مرفوض</option>
+                <option value="قيد المراجعة" {% if status=='قيد المراجعة' %}selected{% endif %}>قيد المراجعة</option>
+            </select>
+            <select name="type" class="form-select form-select-sm" style="width:auto">
+                <option value="">النوع</option>
+                {% for t in types %}
+                <option value="{{ t.Type_AIDE }}" {% if type_aide==t.Type_AIDE %}selected{% endif %}>{{ t.Type_AIDE }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i></button>
+        </form>
+        <a href="{{ url_for('add_aide') }}" class="btn btn-warning btn-sm"><i class="bi bi-plus"></i> منحة</a>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>#</th><th>الموظف</th><th>النوع</th><th>المبلغ</th><th>الوثيقة</th><th>الحالة</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for a in aides %}
+            <tr>
+                <td>{{ a.ID }}</td>
+                <td>
+                    <a href="{{ url_for('view_employee', id=a.Employee_ID) }}">#{{ a.Employee_ID }}</a>
+                    {{ a.Name_AR or a.Name }}
+                </td>
+                <td>{{ a.Type_AIDE }}</td>
+                <td>{{ "{:,.0f}".format(a.Montant or 0) }}</td>
+                <td>{{ a.N_Doc or '-' }}</td>
+                <td><span class="badge bg-info">{{ a.Status }}</span></td>
+                <td class="text-nowrap">
+                    <a href="{{ url_for('aide_certificate', id=a.ID) }}" class="btn btn-sm btn-outline-secondary" title="شهادة"><i class="bi bi-award"></i></a>
+                    <a href="{{ url_for('edit_aide', id=a.ID) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    <a href="{{ url_for('delete_aide', id=a.ID) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('حذف؟')"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-muted py-4">لا توجد منح</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

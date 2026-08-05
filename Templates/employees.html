@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}الموظفون{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <h4 class="mb-0"><i class="bi bi-people me-2"></i>الموظفون</h4>
+    <div class="d-flex gap-2">
+        <form method="get" class="d-flex gap-1">
+            <input type="text" name="q" class="form-control form-control-sm" value="{{ q }}" placeholder="بحث...">
+            <button class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i></button>
+        </form>
+        <a href="{{ url_for('add_employee') }}" class="btn btn-primary btn-sm"><i class="bi bi-person-plus"></i> إضافة</a>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>#</th><th>الاسم</th><th>بالعربية</th><th>الجنس</th><th>RIP</th><th>القسم</th><th>الهاتف</th><th>إجراءات</th></tr>
+            </thead>
+            <tbody>
+            {% for e in employees %}
+            <tr>
+                <td>{{ e.ID }}</td>
+                <td>{{ e.Name }}</td>
+                <td>{{ e.Name_AR or '-' }}</td>
+                <td>{{ e.Sex or '-' }}</td>
+                <td>{{ e.RIP or '-' }}</td>
+                <td>{{ e.Department or '-' }}</td>
+                <td>{{ e.Phone or '-' }}</td>
+                <td class="text-nowrap">
+                    <a href="{{ url_for('view_employee', id=e.ID) }}" class="btn btn-sm btn-outline-info" title="عرض"><i class="bi bi-eye"></i></a>
+                    <a href="{{ url_for('edit_employee', id=e.ID) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    <a href="{{ url_for('report_employee', id=e.ID) }}" class="btn btn-sm btn-outline-secondary" title="تقرير"><i class="bi bi-printer"></i></a>
+                    <a href="{{ url_for('delete_employee', id=e.ID) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('حذف؟')"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center text-muted py-4">لا يوجد موظفون</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

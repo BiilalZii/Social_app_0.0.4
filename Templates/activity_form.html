@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ 'تعديل نشاط' if activity else 'تسجيل استفادة من نشاط' }}{% endblock %}
+{% block content %}
+<h4 class="mb-3">{{ 'تعديل سجل النشاط' if activity else 'تسجيل استفادة موظف من نشاط' }}</h4>
+<div class="card p-4" style="max-width:700px">
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">الموظف * <small class="text-muted">(ابحث بالرقم أو الاسم)</small></label>
+            <select name="employee_id" class="form-select select2-employee" required>
+                <option value="">-- اختر الموظف --</option>
+                {% for e in employees %}
+                <option value="{{ e.ID }}" {% if activity and activity.Employee_ID==e.ID %}selected{% endif %}>
+                    #{{ e.ID }} — {{ e.Name_AR or e.Name }}{% if e.RIP %} ({{ e.RIP }}){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">النشاط *</label>
+            <select name="type_activity" class="form-select" required id="typeActivity">
+                <option value="">--</option>
+                {% for t in activity_types %}
+                <option value="{{ t.Type_Activity }}" data-value="{{ t.Value }}"
+                    {% if activity and activity.Type_Activity==t.Type_Activity %}selected{% endif %}>
+                    {{ t.Type_Activity }} ({{ "{:,.0f}".format(t.Value) }})
+                </option>
+                {% endfor %}
+            </select>
+            <small class="text-muted">لإضافة نشاط جديد إلى القائمة، توجّه إلى <a href="{{ url_for('activity_types') }}">أنواع النشاطات</a>.</small>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">المبلغ المستحق</label>
+                <input type="number" step="0.01" name="montant" id="montant" class="form-control" value="{{ activity.Montant if activity else '' }}" placeholder="فارغ = القيمة الافتراضية للنشاط">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">تاريخ النشاط</label>
+                <input type="date" name="date_activity" class="form-control" value="{{ activity.Date_Activity if activity else '' }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">ملاحظات</label>
+            <textarea name="notes" class="form-control" rows="2">{{ activity.Notes if activity else '' }}</textarea>
+        </div>
+        {% if activity %}
+        <div class="mb-3">
+            <label class="form-label">الحالة</label>
+            <select name="status" class="form-select">
+                <option value="مستفيد" {% if activity.Status=='مستفيد' %}selected{% endif %}>مستفيد</option>
+                <option value="ملغى" {% if activity.Status=='ملغى' %}selected{% endif %}>ملغى</option>
+            </select>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-info text-white">حفظ</button>
+        <a href="{{ url_for('activities') }}" class="btn btn-secondary">إلغاء</a>
+    </form>
+</div>
+<script>
+document.getElementById('typeActivity')?.addEventListener('change', function() {
+    const opt = this.options[this.selectedIndex];
+    const val = opt.getAttribute('data-value');
+    if (val && !document.getElementById('montant').value)
+        document.getElementById('montant').value = val;
+});
+</script>
+{% endblock %}

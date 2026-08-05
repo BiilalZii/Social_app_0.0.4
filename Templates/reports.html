@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}التقارير{% endblock %}
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-file-earmark-bar-graph me-2"></i>التقارير</h4>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+            <i class="bi bi-clipboard-data fs-1 text-primary mb-2"></i>
+            <h5>تقرير ملخص شامل</h5>
+            <p class="text-muted small">الميزانية، الإحصائيات، المجاميع</p>
+            <a href="{{ url_for('report_summary') }}" class="btn btn-primary">عرض وطباعة</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+            <i class="bi bi-gift fs-1 text-warning mb-2"></i>
+            <h5>تقرير المنح</h5>
+            <p class="text-muted small">تفصيلي مع فلترة حسب النوع والحالة</p>
+            <a href="{{ url_for('report_aides') }}" class="btn btn-warning">عرض وطباعة</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+            <i class="bi bi-cash-stack fs-1 text-success mb-2"></i>
+            <h5>تقرير القروض</h5>
+            <p class="text-muted small">تفصيلي مع فلترة حسب الحالة والنوع</p>
+            <a href="{{ url_for('report_credits') }}" class="btn btn-success">عرض وطباعة</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+            <i class="bi bi-stars fs-1 text-info mb-2"></i>
+            <h5>تقرير النشاطات</h5>
+            <p class="text-muted small">تفصيلي مع فلترة حسب النوع والحالة والتاريخ</p>
+            <a href="{{ url_for('report_activities') }}" class="btn btn-info text-white">عرض وطباعة</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

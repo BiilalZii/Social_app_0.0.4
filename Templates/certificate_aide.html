@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}شهادة استفادة من منحة{% endblock %}
+{% block content %}
+<div class="no-print mb-3">
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة الشهادة</button>
+    <a href="{{ url_for('aides') }}" class="btn btn-secondary">رجوع</a>
+</div>
+<div class="certificate">
+    <div class="text-center mb-4">
+        <h5 class="mb-1">{{ office_name }}</h5>
+        <h2 class="mt-3">شهادة استفادة من منحة</h2>
+        <p class="text-muted">رقم المنحة: {{ a.ID }}</p>
+    </div>
+    <p class="lead" style="line-height:2">
+        يشهد مكتب الخدمات الاجتماعية بأن الموظف/ة:
+    </p>
+    <table class="table table-bordered mb-4">
+        <tr><td width="30%">الاسم الكامل</td><td><strong>{{ a.Name_AR or a.Name }}</strong></td></tr>
+        <tr><td>رقم التعريف (ID)</td><td>{{ a.Employee_ID }}</td></tr>
+        <tr><td>رقم RIP</td><td>{{ a.RIP or '-' }}</td></tr>
+        <tr><td>القسم</td><td>{{ a.Department or '-' }}</td></tr>
+    </table>
+    <p>قد استفاد من منحة غير مستردة من نوع:</p>
+    <div class="text-center my-3">
+        <h3 class="text-warning">{{ a.Type_AIDE }}</h3>
+        <h4>{{ "{:,.0f}".format(a.Montant or 0) }} د.ج</h4>
+    </div>
+    <table class="table table-sm table-bordered mb-4">
+        <tr><td>نوع الوثيقة</td><td>{{ a.Type_Doc or '-' }}</td></tr>
+        <tr><td>رقم الوثيقة</td><td>{{ a.N_Doc or '-' }}</td></tr>
+        <tr><td>تاريخ الوثيقة</td><td>{{ a.Date_Doc or '-' }}</td></tr>
+        <tr><td>حالة المنحة</td><td>{{ a.Status }}</td></tr>
+        <tr><td>تاريخ التسجيل</td><td>{{ a.Created_At[:10] if a.Created_At else '-' }}</td></tr>
+    </table>
+    <div class="row mt-5">
+        <div class="col-6 text-center">
+            <p>توقيع المسؤول</p>
+            <br><br>
+            <p>____________</p>
+        </div>
+        <div class="col-6 text-center">
+            <p>ختم المكتب</p>
+            <br><br>
+            <p>____________</p>
+        </div>
+    </div>
+    <p class="text-muted text-center mt-4 small">تاريخ الإصدار: {{ now }}</p>
+</div>
+{% endblock %}

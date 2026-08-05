@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}إيقاف تسديد القرض{% endblock %}
+{% block content %}
+<h4 class="mb-3">إيقاف مؤقت لتسديد القرض #{{ c.ID }}</h4>
+<div class="card p-4" style="max-width:500px">
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">سبب الإيقاف *</label>
+            <textarea name="pause_reason" class="form-control" rows="3" required placeholder="مثال: إجازة مرضية، ظرف عائلي..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-warning">تأكيد الإيقاف</button>
+        <a href="{{ url_for('credit_detail', id=c.ID) }}" class="btn btn-secondary">إلغاء</a>
+    </form>
+</div>
+{% endblock %}

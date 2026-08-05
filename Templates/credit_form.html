@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ 'تعديل قرض' if credit else 'قرض جديد' }}{% endblock %}
+{% block content %}
+<h4 class="mb-3">{{ 'تعديل قرض' if credit else 'تسجيل قرض جديد' }}</h4>
+<div class="card p-4" style="max-width:700px">
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">الموظف * <small class="text-muted">(ابحث بالرقم أو الاسم)</small></label>
+            <select name="employee_id" class="form-select select2-employee" required>
+                <option value="">-- اختر الموظف --</option>
+                {% for e in employees %}
+                <option value="{{ e.ID }}" {% if credit and credit.Employee_ID==e.ID %}selected{% endif %}>
+                    #{{ e.ID }} — {{ e.Name_AR or e.Name }}{% if e.RIP %} ({{ e.RIP }}){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">نوع القرض *</label>
+            <select name="type_credit" class="form-select" required>
+                <option value="">--</option>
+                <option value="سلفة نقدية" {% if credit and credit.Type_Credit=='سلفة نقدية' %}selected{% endif %}>سلفة نقدية</option>
+                <option value="قرض مستلزمات" {% if credit and credit.Type_Credit=='قرض مستلزمات' %}selected{% endif %}>قرض مستلزمات</option>
+            </select>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">المبلغ *</label>
+                <input type="number" step="0.01" name="montant" class="form-control" required value="{{ credit.Montant if credit else '' }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">عدد الأشهر</label>
+                <input type="number" name="months" class="form-control" value="{{ credit.Months if credit else 10 }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">تاريخ بداية التسديد</label>
+                <input type="date" name="start_date" class="form-control" value="{{ credit.Start_Date[:10] if credit and credit.Start_Date else '' }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">رقم الشيك</label>
+                <input type="text" name="n_check" class="form-control" value="{{ credit.N_check if credit else '' }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">تاريخ الشيك</label>
+                <input type="date" name="d_check" class="form-control" value="{{ credit.D_check if credit else '' }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">ملاحظات</label>
+            <textarea name="notes" class="form-control" rows="2">{{ credit.Notes if credit else '' }}</textarea>
+        </div>
+        {% if credit %}
+        <div class="mb-3">
+            <label class="form-label">الحالة</label>
+            <select name="status" class="form-select">
+                <option value="نشط" {% if credit.Status=='نشط' %}selected{% endif %}>نشط</option>
+                <option value="مسدد" {% if credit.Status=='مسدد' %}selected{% endif %}>مسدد</option>
+                <option value="ملغي" {% if credit.Status=='ملغي' %}selected{% endif %}>ملغي</option>
+            </select>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-success">حفظ</button>
+        <a href="{{ url_for('credits') }}" class="btn btn-secondary">إلغاء</a>
+    </form>
+</div>
+{% endblock %}

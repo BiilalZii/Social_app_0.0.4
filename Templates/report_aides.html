@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}تقرير المنح{% endblock %}
+{% block content %}
+<div class="print-header">
+    <h3>{{ office_name }}</h3>
+    <p>تقرير المنح — {{ now }}</p>
+</div>
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 no-print">
+    <h4>تقرير المنح</h4>
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة</button>
+</div>
+<form method="get" class="card p-3 mb-3 no-print">
+    <div class="row g-2 align-items-end">
+        <div class="col-auto">
+            <label class="form-label small">الحالة</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">الكل</option>
+                <option value="مقبول" {% if status=='مقبول' %}selected{% endif %}>مقبول</option>
+                <option value="مرفوض" {% if status=='مرفوض' %}selected{% endif %}>مرفوض</option>
+                <option value="قيد المراجعة" {% if status=='قيد المراجعة' %}selected{% endif %}>قيد المراجعة</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label small">النوع</label>
+            <select name="type" class="form-select form-select-sm">
+                <option value="">الكل</option>
+                {% for t in types %}
+                <option value="{{ t.Type_AIDE }}" {% if type_aide==t.Type_AIDE %}selected{% endif %}>{{ t.Type_AIDE }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label small">من تاريخ</label>
+            <input type="date" name="from_date" class="form-control form-control-sm" value="{{ from_date }}">
+        </div>
+        <div class="col-auto">
+            <label class="form-label small">إلى تاريخ</label>
+            <input type="date" name="to_date" class="form-control form-control-sm" value="{{ to_date }}">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-sm btn-primary">تطبيق</button>
+        </div>
+    </div>
+</form>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0">
+            <thead>
+                <tr><th>#</th><th>الموظف</th><th>RIP</th><th>النوع</th><th>المبلغ</th><th>الوثيقة</th><th>الحالة</th><th>التاريخ</th></tr>
+            </thead>
+            <tbody>
+            {% for a in rows %}
+            <tr>
+                <td>{{ a.ID }}</td>
+                <td>{{ a.Name_AR or a.Name }}</td>
+                <td>{{ a.RIP or '-' }}</td>
+                <td>{{ a.Type_AIDE }}</td>
+                <td>{{ "{:,.0f}".format(a.Montant or 0) }}</td>
+                <td>{{ a.N_Doc or '-' }}</td>
+                <td>{{ a.Status }}</td>
+                <td>{{ a.Created_At[:10] if a.Created_At else '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center text-muted">لا توجد نتائج</td></tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-light fw-bold">
+                    <td colspan="4">المجموع ({{ rows|length }} سجل)</td>
+                    <td>{{ "{:,.0f}".format(total) }}</td>
+                    <td colspan="3"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}

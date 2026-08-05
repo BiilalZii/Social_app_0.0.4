@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}تقرير ملخص{% endblock %}
+{% block content %}
+<div class="print-header">
+    <h3>{{ office_name }}</h3>
+    <p>تقرير ملخص شامل — {{ now }}</p>
+</div>
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h4>تقرير ملخص شامل</h4>
+    <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> طباعة</button>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6><i class="bi bi-cash-coin me-1"></i> حساب القروض</h6>
+            <div class="row text-center">
+                <div class="col-4"><div class="text-muted small">المخصصة</div><strong>{{ "{:,.0f}".format(budget.credits.total) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">غير مسدد</div><strong class="text-info">{{ "{:,.0f}".format(budget.credits.outstanding) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">المتاح</div><strong class="text-success">{{ "{:,.0f}".format(budget.credits.remaining) }}</strong></div>
+            </div>
+            <div class="progress mt-2" style="height:18px">
+                <div class="progress-bar" style="width:{{ budget.credits.percent_used }}%">{{ budget.credits.percent_used }}%</div>
+            </div>
+            {% if budget.credits.bank_account %}<div class="text-muted small mt-2">الحساب البنكي: {{ budget.credits.bank_account }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6><i class="bi bi-gift me-1"></i> حساب المنح والنشاطات</h6>
+            <div class="row text-center">
+                <div class="col-4"><div class="text-muted small">المخصصة</div><strong>{{ "{:,.0f}".format(budget.aides.total) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">المصروف</div><strong class="text-danger">{{ "{:,.0f}".format(budget.aides.spent_total) }}</strong></div>
+                <div class="col-4"><div class="text-muted small">المتبقي</div><strong class="text-success">{{ "{:,.0f}".format(budget.aides.remaining) }}</strong></div>
+            </div>
+            <div class="progress mt-2" style="height:18px">
+                <div class="progress-bar" style="width:{{ budget.aides.percent_used }}%">{{ budget.aides.percent_used }}%</div>
+            </div>
+            {% if budget.aides.bank_account %}<div class="text-muted small mt-2">الحساب البنكي: {{ budget.aides.bank_account }}</div>{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h6>القروض</h6>
+            <table class="table table-sm">
+                <thead><tr><th>الحالة</th><th>العدد</th><th>المبلغ</th></tr></thead>
+                <tbody>
+                {% for c in credits %}
+                <tr><td>{{ c.Status }}</td><td>{{ c.cnt }}</td><td>{{ "{:,.0f}".format(c.total) }}</td></tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">لا بيانات</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h6>المنح</h6>
+            <table class="table table-sm">
+                <thead><tr><th>الحالة</th><th>العدد</th><th>المبلغ</th></tr></thead>
+                <tbody>
+                {% for a in aides %}
+                <tr><td>{{ a.Status }}</td><td>{{ a.cnt }}</td><td>{{ "{:,.0f}".format(a.total) }}</td></tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">لا بيانات</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h6>النشاطات</h6>
+            <table class="table table-sm">
+                <thead><tr><th>الحالة</th><th>العدد</th><th>المبلغ</th></tr></thead>
+                <tbody>
+                {% for a in activities %}
+                <tr><td>{{ a.Status }}</td><td>{{ a.cnt }}</td><td>{{ "{:,.0f}".format(a.total) }}</td></tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">لا بيانات</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6>المنح حسب النوع</h6>
+            <table class="table table-sm">
+                <thead><tr><th>النوع</th><th>العدد</th><th>المجموع</th></tr></thead>
+                <tbody>
+                {% for r in aides_by_type %}
+                <tr><td>{{ r.Type_AIDE }}</td><td>{{ r.cnt }}</td><td>{{ "{:,.0f}".format(r.total) }}</td></tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">لا بيانات</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h6>النشاطات حسب النوع</h6>
+            <table class="table table-sm">
+                <thead><tr><th>النوع</th><th>العدد</th><th>المجموع</th></tr></thead>
+                <tbody>
+                {% for r in activities_by_type %}
+                <tr><td>{{ r.Type_Activity }}</td><td>{{ r.cnt }}</td><td>{{ "{:,.0f}".format(r.total) }}</td></tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">لا بيانات</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3">
+    <h6>القروض حسب النوع</h6>
+    <table class="table table-sm">
+        <thead><tr><th>النوع</th><th>العدد</th><th>المجموع</th></tr></thead>
+        <tbody>
+        {% for r in credits_by_type %}
+        <tr><td>{{ r.Type_Credit }}</td><td>{{ r.cnt }}</td><td>{{ "{:,.0f}".format(r.total) }}</td></tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">لا بيانات</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<p class="text-muted small mt-3">عدد الموظفين: {{ employees_count }} | تاريخ التقرير: {{ now }}</p>
+{% endblock %}

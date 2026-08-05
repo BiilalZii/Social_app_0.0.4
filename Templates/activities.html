@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}النشاطات{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <h4 class="mb-0"><i class="bi bi-stars me-2"></i>النشاطات
+        <small class="text-muted fs-6">| مجموع المستحقات: {{ "{:,.0f}".format(total) }}</small>
+    </h4>
+    <div class="d-flex gap-2 flex-wrap">
+        <form method="get" class="d-flex gap-1 flex-wrap">
+            <input type="text" name="q" class="form-control form-control-sm" value="{{ q }}" placeholder="بحث..." style="width:130px">
+            <select name="status" class="form-select form-select-sm" style="width:auto">
+                <option value="">الحالة</option>
+                <option value="مستفيد" {% if status=='مستفيد' %}selected{% endif %}>مستفيد</option>
+                <option value="ملغى" {% if status=='ملغى' %}selected{% endif %}>ملغى</option>
+            </select>
+            <select name="type" class="form-select form-select-sm" style="width:auto">
+                <option value="">النوع</option>
+                {% for t in types %}
+                <option value="{{ t.Type_Activity }}" {% if type_activity==t.Type_Activity %}selected{% endif %}>{{ t.Type_Activity }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-sm btn-outline-primary"><i class="bi bi-search"></i></button>
+        </form>
+        <a href="{{ url_for('add_activity') }}" class="btn btn-info btn-sm text-white"><i class="bi bi-plus"></i> نشاط</a>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>#</th><th>الموظف</th><th>النشاط</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for a in activities %}
+            <tr>
+                <td>{{ a.ID }}</td>
+                <td>
+                    <a href="{{ url_for('view_employee', id=a.Employee_ID) }}">#{{ a.Employee_ID }}</a>
+                    {{ a.Name_AR or a.Name }}
+                </td>
+                <td>{{ a.Type_Activity }}</td>
+                <td>{{ "{:,.0f}".format(a.Montant or 0) }}</td>
+                <td>{{ a.Date_Activity or (a.Created_At[:10] if a.Created_At else '-') }}</td>
+                <td><span class="badge {% if a.Status=='ملغى' %}bg-secondary{% else %}bg-info{% endif %}">{{ a.Status }}</span></td>
+                <td class="text-nowrap">
+                    <a href="{{ url_for('activity_certificate', id=a.ID) }}" class="btn btn-sm btn-outline-secondary" title="شهادة"><i class="bi bi-award"></i></a>
+                    <a href="{{ url_for('edit_activity', id=a.ID) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                    <a href="{{ url_for('delete_activity', id=a.ID) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('حذف؟')"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-muted py-4">لا توجد نشاطات مسجلة</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
